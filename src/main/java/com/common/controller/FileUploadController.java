@@ -68,8 +68,6 @@ public class FileUploadController {
         final FileInfo fileInfo = infoService.save(new FileInfo(file.getOriginalFilename(), fileExtension, System.currentTimeMillis() + "", file.getSize()));
         ids.add(fileInfo.getId());
 
-        System.out.println(fileInfo.toString());
-
         return ResponseEntity.status(200).body(ids);
     }
 

@@ -37,10 +37,10 @@ public class Application  implements CommandLineRunner {
 
         return (args) -> {
 
-            // TODO: 22/09/17 extract to property
-            repository.deleteAll();
-            storageService.deleteAll();
-            storageService.init();
+            //clear files on restart
+//            repository.deleteAll();
+//            storageService.deleteAll();
+//            storageService.init();
         };
     }
 }
