@@ -117,16 +117,16 @@ or run project from sources without building:
 
 - find file by id and size BIG which was deleted from file system without using server API: 
       
-      request: curl -X GET -i http://localhost:8080/image-store/<FILE_ID>/big
-      example: curl -X GET -i http://localhost:8080/image-store/59c50688154daa7d35ace1de/big
+        request: curl -X GET -i http://localhost:8080/image-store/<FILE_ID>/big
+        example: curl -X GET -i http://localhost:8080/image-store/59c50688154daa7d35ace1de/big
+           
+        HTTP/1.1 500 
+        Content-Type: application/json;charset=UTF-8
+        Transfer-Encoding: chunked
+        Date: Fri, 22 Sep 2017 13:29:53 GMT
+        Connection: close
         
-     HTTP/1.1 500 
-     Content-Type: application/json;charset=UTF-8
-     Transfer-Encoding: chunked
-     Date: Fri, 22 Sep 2017 13:29:53 GMT
-     Connection: close
-     
-     {"cause":null,"stackTrace":[{"methodName":"loadAsR...  
+        {"cause":null,"stackTrace":[{"methodName":"loadAsR...  
       
 - delete file by id:
 
