@@ -40,7 +40,7 @@ public class Application  implements CommandLineRunner {
             //clear files on restart
 //            repository.deleteAll();
 //            storageService.deleteAll();
-//            storageService.init();
+            storageService.init();
         };
     }
 }
