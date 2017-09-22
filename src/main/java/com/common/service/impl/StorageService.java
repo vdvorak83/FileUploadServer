@@ -1,11 +1,13 @@
 package com.common.service.impl;
 
 import com.common.exception.FileExtensionFormatException;
+import com.common.exception.MultipartFileContentTypeException;
 import com.common.exception.StorageException;
 import com.common.exception.StorageFileNotFoundException;
 import com.common.props.StorageProperties;
 import com.common.util.ImageHelper;
 import com.common.util.ImageSize;
+import com.common.util.SupportedImageExtesion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -13,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import sun.nio.ch.IOUtil;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -47,7 +48,7 @@ public class StorageService {
         this.tmpLocation = Paths.get(properties.getTmpDir());
     }
 
-    public void store(MultipartFile file) {
+    public void store(MultipartFile file) throws FileExtensionFormatException, StorageException, MultipartFileContentTypeException {
 
         String filename = StringUtils.cleanPath(file.getOriginalFilename());
         try {
@@ -61,45 +62,52 @@ public class StorageService {
                                 + filename);
             }
 
+            String fileExtension = ImageHelper.getFileExtension(file.getOriginalFilename());
+
+
             //throw exception if file extension if unsupported
-            //or content type was set not correctly
-            final String[] split = file.getContentType().split("/");
-            if (split.length != 2 && (!split[1].equalsIgnoreCase("jpeg") // TODO: 20/09/17 extract in constants
-                    || !split[1].equalsIgnoreCase("jpg")
-                    || !split[1].equalsIgnoreCase("png"))) {
-                try {
-                    throw new FileExtensionFormatException(split[1]);
-                } catch (FileExtensionFormatException e) {
-                    e.printStackTrace();
-                }
+            if (fileExtension == null){
+                throw new MultipartFileContentTypeException(file.getContentType());
             }
 
-            // TODO: 20/09/17 resize
-            //1 save file to tmp folder
+            if (SupportedImageExtesion.fromString(fileExtension) == null) {
+                throw new FileExtensionFormatException(fileExtension);
+            }
+
+            //save file to tmp folder
             Files.copy(file.getInputStream(), this.tmpLocation.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
-            //2 get path to tmp file
+
+            //get path to tmp file
             final String path = this.tmpLocation.resolve(filename).toFile().getPath();
-            //3 ImageHelper.resizeImage()
-            final BufferedImage bufferedImage = ImageHelper.resizeImage(path);
-            //4 remove in tmp folder source image
+
+            //resize image to destination sizes
+            BufferedImage smallImage = null;
+            BufferedImage mediumImage = null;
+            BufferedImage bigImage = null;
+
+//            smallImage = ImageHelper.resizeImage(ImageIO.read(new File(path)), ImageHelper.SMALL_WIDTH, ImageHelper.SMALL_HEIGHT);
+//            mediumImage = ImageHelper.resizeImage(ImageIO.read(new File(path)), ImageHelper.MEDIUM_WIDTH, ImageHelper.MEDIUM_HEIGHT);
+//            bigImage = ImageHelper.resizeImage(ImageIO.read(new File(path)), ImageHelper.BIG_WIDTH, ImageHelper.BIG_HEIGHT);
+
+            smallImage = ImageHelper.resizeWithAspectRatio(ImageIO.read(new File(path)), ImageHelper.SMALL_WIDTH, ImageHelper.SMALL_HEIGHT,true);
+            mediumImage = ImageHelper.resizeWithAspectRatio(ImageIO.read(new File(path)), ImageHelper.MEDIUM_WIDTH, ImageHelper.MEDIUM_HEIGHT,true);
+            bigImage = ImageHelper.resizeWithAspectRatio(ImageIO.read(new File(path)), ImageHelper.BIG_WIDTH, ImageHelper.BIG_HEIGHT,true);
+
+
+            //save resized images to destination folders
+            ImageIO.write(smallImage, fileExtension, new File(this.smallSizeLocation.resolve(filename).toFile().getPath()));
+            ImageIO.write(mediumImage, fileExtension, new File(this.mediumSizeLocation.resolve(filename).toFile().getPath()));
+            ImageIO.write(bigImage, fileExtension, new File(this.bigSizeLocation.resolve(filename).toFile().getPath()));
+
+            //remove source image  from tmp folder
             new File(path).delete();
-            //5 save resized images
-            ImageIO.write(bufferedImage, "jpg", new File(this.smallSizeLocation.resolve(filename).toFile().getPath()));
-            ImageIO.write(bufferedImage, "jpg", new File(this.mediumSizeLocation.resolve(filename).toFile().getPath()));
-            ImageIO.write(bufferedImage, "jpg", new File(this.bigSizeLocation.resolve(filename).toFile().getPath()));
 
-
-
-
-//            Files.copy(file.getInputStream(), this.smallSizeLocation.resolve(filename),StandardCopyOption.REPLACE_EXISTING);
-//            Files.copy(file.getInputStream(), this.mediumSizeLocation.resolve(filename),StandardCopyOption.REPLACE_EXISTING);
-//            Files.copy(file.getInputStream(), this.bigSizeLocation.resolve(filename),StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new StorageException("Failed to store file " + filename, e);
         }
     }
 
-    public Stream<Path> loadAll() {
+    public Stream<Path> loadAll() throws StorageException {
         try {
             return Files.walk(this.rootLocation, 1)
                     .filter(path -> !path.equals(this.rootLocation))
@@ -123,20 +131,16 @@ public class StorageService {
         }
     }
 
-    public Resource loadAsResource(String filename, ImageSize size) {
-        try {
+    public Resource loadAsResource(String filename, ImageSize size) throws MalformedURLException, StorageFileNotFoundException {
+
             Path file = this.load(filename, size);
             Resource resource = new UrlResource(file.toUri());
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {
-                throw new StorageFileNotFoundException(
-                        "Could not read file: " + filename);
+                throw new StorageFileNotFoundException("Could not read file: " + filename);
 
             }
-        } catch (MalformedURLException e) {
-            throw new StorageFileNotFoundException("Could not read file: " + filename, e);
-        }
     }
 
     public void delete(String fileName) {
@@ -157,7 +161,7 @@ public class StorageService {
         FileSystemUtils.deleteRecursively(bigSizeLocation.toFile());
     }
 
-    public void init() {
+    public void init() throws StorageException {
         try {
             Files.createDirectories(rootLocation);
             Files.createDirectories(tmpLocation);

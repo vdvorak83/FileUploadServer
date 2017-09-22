@@ -1,6 +1,5 @@
 package com.common;
 
-import com.common.domain.FileInfo;
 import com.common.persistence.FileInfoRepository;
 import com.common.props.StorageProperties;
 import com.common.service.impl.StorageService;
@@ -10,9 +9,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EnableConfigurationProperties(StorageProperties.class)
+@ComponentScan(basePackages = {"com.common"})
 public class Application  implements CommandLineRunner {
 
     public static void main(String[] args) {
@@ -34,20 +35,9 @@ public class Application  implements CommandLineRunner {
     @Bean
     CommandLineRunner init(StorageService storageService) {
 
-//
-//        // save a couple of customers
-//        repository.save(new FileInfo("Alice", "Smith", "sdas",12.22));
-//        repository.save(new FileInfo("Alice", "Smith", "sdas",12.223333));
-//
-        // fetch all customers
-//        System.out.println("Customers found with findAll():");
-//        System.out.println("-------------------------------");
-//        for (FileInfo customer : repository.findAll()) {
-//            System.out.println(customer);
-//        }
-//        System.out.println();
-
         return (args) -> {
+
+            // TODO: 22/09/17 extract to property
             repository.deleteAll();
             storageService.deleteAll();
             storageService.init();
