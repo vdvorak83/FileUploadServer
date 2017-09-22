@@ -37,10 +37,11 @@ or run project from sources without building:
 
 **Server usage:**
 
-- upload single file:
-      request:
-      `curl -X POST  -F 'file=@<PATH_TO_FILE>' -i  http://localhost:8080/image-store/upload/single`
-      example:`curl -X POST  -F 'file=@/Users/kirya/Desktop/Atlantis Nebula UHD.jpg' -i  http://localhost:8080/image-store/upload/single`
+- upload single file: 
+      
+      request: curl -X POST  -F 'file=@<PATH_TO_FILE>' -i  http://localhost:8080/image-store/upload/single
+      
+      example: curl -X POST  -F 'file=@/Users/kirya/Desktop/Atlantis Nebula UHD.jpg' -i  http://localhost:8080/image-store/upload/single
       
       HTTP/1.1 200 
       Content-Type: application/json;charset=UTF-8
@@ -50,9 +51,10 @@ or run project from sources without building:
       ["59c505e3154daa7d35ace1dd"]
       
 - upload single file with existing name:
-      request:
-      `curl -X POST  -F 'file=@<PATH_TO_FILE>' -i  http://localhost:8080/image-store/upload/single`
-      example:`curl -X POST  -F 'file=@/Users/kirya/Desktop/Atlantis Nebula UHD.jpg' -i  http://localhost:8080/image-store/upload/single`
+
+      request: curl -X POST  -F 'file=@<PATH_TO_FILE>' -i  http://localhost:8080/image-store/upload/single
+      
+      example: curl -X POST  -F 'file=@/Users/kirya/Desktop/Atlantis Nebula UHD.jpg' -i  http://localhost:8080/image-store/upload/single
       
       HTTP/1.1 400 
       Content-Type: application/json;charset=UTF-8
@@ -63,8 +65,10 @@ or run project from sources without building:
       {"cause":null,"stackTrace":[{"methodName":"...     
         
 - upload single file with wrong format name:
-      request:`curl -X POST  -F 'file=@<FILE_PATH>' -i  http://localhost:8080/image-store/upload/single`
-      example:`curl -X POST  -F 'file=@/Users/kirya/Desktop/test1.mp3' -i  http://localhost:8080/image-store/upload/single`
+
+      request: curl -X POST  -F 'file=@<FILE_PATH>' -i  http://localhost:8080/image-store/upload/single
+      
+      example: curl -X POST  -F 'file=@/Users/kirya/Desktop/test1.mp3' -i  http://localhost:8080/image-store/upload/single 
       
       HTTP/1.1 400 
       Content-Type: application/json;charset=UTF-8
@@ -76,8 +80,9 @@ or run project from sources without building:
       
               
 - upload multiple files:
-      request: `curl -X POST -F 'file=@<PATH_TO_FILE>' -F 'file=@<PATH_TO_FILE>' -i http://localhost:8080/image-store/upload/multiple`
-      example: `curl -X POST -F 'file=@/Users/kirya/Desktop/Ff6a9mL.jpg' -F 'file=@/Users/kirya/Desktop/FQVWz2.jpg' -i http://localhost:8080/image-store/upload/multiple`
+
+      request: curl -X POST -F 'file=@<PATH_TO_FILE>' -F 'file=@<PATH_TO_FILE>' -i http://localhost:8080/image-store/upload/multiple
+      example: curl -X POST -F 'file=@/Users/kirya/Desktop/Ff6a9mL.jpg' -F 'file=@/Users/kirya/Desktop/FQVWz2.jpg' -i http://localhost:8080/image-store/upload/multiple
       
       HTTP/1.1 200 
       Content-Type: application/json;charset=UTF-8
@@ -87,8 +92,10 @@ or run project from sources without building:
       ["59c50688154daa7d35ace1de","59c50689154daa7d35ace1df"]
                       
 - find file by id and size SMALL: 
-      request: `curl -X GET -i http://localhost:8080/image-store/<FILE_ID>/small`
-      example: `curl -X GET -i http://localhost:8080/image-store/59c50688154daa7d35ace1de/small`
+
+      request: curl -X GET -i http://localhost:8080/image-store/<FILE_ID>/small
+      
+      example: curl -X GET -i http://localhost:8080/image-store/59c50688154daa7d35ace1de/small
         
       HTTP/1.1 200 
       Content-Disposition: attachment; filename="Ff6a9mL.jpg"
@@ -97,8 +104,10 @@ or run project from sources without building:
       Date: Fri, 22 Sep 2017 12:51:05 GMT
       
 - find file by id and size BIG: 
-      request: `curl -X GET -i http://localhost:8080/image-store/<FILE_ID>/big`
-      example: `curl -X GET -i http://localhost:8080/image-store/59c50688154daa7d35ace1de/big`
+
+      request: curl -X GET -i http://localhost:8080/image-store/<FILE_ID>/big
+      
+      example: curl -X GET -i http://localhost:8080/image-store/59c50688154daa7d35ace1de/big
         
       HTTP/1.1 200 
       Content-Disposition: attachment; filename="Ff6a9mL.jpg"
@@ -107,8 +116,9 @@ or run project from sources without building:
       Date: Fri, 22 Sep 2017 12:51:05 GMT
 
 - find file by id and size BIG which was deleted from file system without using server API: 
-      request: `curl -X GET -i http://localhost:8080/image-store/<FILE_ID>/big`
-      example: `curl -X GET -i http://localhost:8080/image-store/59c50688154daa7d35ace1de/big`
+      
+      request: curl -X GET -i http://localhost:8080/image-store/<FILE_ID>/big
+      example: curl -X GET -i http://localhost:8080/image-store/59c50688154daa7d35ace1de/big
         
      HTTP/1.1 500 
      Content-Type: application/json;charset=UTF-8
@@ -119,16 +129,18 @@ or run project from sources without building:
      {"cause":null,"stackTrace":[{"methodName":"loadAsR...  
       
 - delete file by id:
-      request: `curl -X DELETE -i http://localhost:8080/image-store/delete/<FILE_ID>`
-      example: `curl -X DELETE -i http://localhost:8080/image-store/delete/59c50688154daa7d35ace1de`
+
+      request: curl -X DELETE -i http://localhost:8080/image-store/delete/<FILE_ID>
+      example: curl -X DELETE -i http://localhost:8080/image-store/delete/59c50688154daa7d35ace1de
        
       HTTP/1.1 200 
       Content-Length: 0
       Date: Fri, 22 Sep 2017 12:56:58 GMT
       
 - delete file by id with not existing id:
-      request: `curl -X DELETE -i http://localhost:8080/image-store/delete/<FILE_ID>`
-      example: `curl -X DELETE -i http://localhost:8080/image-store/delete/59c50688154daa7d35ace1de`
+
+      request: curl -X DELETE -i http://localhost:8080/image-store/delete/<FILE_ID>
+      example: curl -X DELETE -i http://localhost:8080/image-store/delete/59c50688154daa7d35ace1de
        
       HTTP/1.1 400 
       Content-Type: application/json;charset=UTF-8
@@ -137,7 +149,8 @@ or run project from sources without building:
       Connection: close
       
 - delete all:
-      request:`curl -X DELETE -i http://localhost:8080/image-store/delete/all`
+
+      request: curl -X DELETE -i http://localhost:8080/image-store/delete/all
       
       HTTP/1.1 200 
       Content-Length: 0
