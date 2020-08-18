@@ -119,7 +119,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
-            <version>1.5.7.RELEASE</version>
+            <version>1.5.22.RELEASE</version>
         </dependency>
 
 
